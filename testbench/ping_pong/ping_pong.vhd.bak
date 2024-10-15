@@ -1,0 +1,91 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity ping_pong_tb is
+end ping_pong_tb;
+
+architecture Behavioral of ping_pong_tb is
+    -- Component Declaration
+    component ping_pong is
+        port (
+            clk : in std_logic;
+            reset : in std_logic;
+            paddle_up : in std_logic;
+            paddle_down : in std_logic;
+            ball_x : out std_logic_vector(7 downto 0);
+            ball_y : out std_logic_vector(7 downto 0);
+            ball_dx : in std_logic_vector(2 downto 0);
+            ball_dy : in std_logic_vector(2 downto 0);
+            score : out std_logic_vector(7 downto 0)
+        );
+    end component;
+    -- Signals
+    signal clk : std_logic := '0';
+    signal reset : std_logic := '0';
+    signal paddle_up : std_logic := '0';
+    signal paddle_down : std_logic := '0';
+    signal ball_x : std_logic_vector(7 downto 0);
+    signal ball_y : std_logic_vector(7 downto 0);
+    signal ball_dx : std_logic_vector(2 downto 0) := "001";
+    signal ball_dy : std_logic_vector(2 downto 0) := "001";
+    signal score : std_logic_vector(7 downto 0);
+begin
+    -- Component Instantiation
+    DUT : ping_pong
+        port map (
+            clk => clk,
+            reset => reset,
+            paddle_up => paddle_up,
+            paddle_down => paddle_down,
+            ball_x => ball_x,
+            ball_y => ball_y,
+            ball_dx => ball_dx,
+            ball_dy => ball_dy,
+            score => score
+        );
+    
+    -- Clock Generation
+    process
+    begin
+        clk <= '0';
+        wait for 10 ns;
+        clk <= '1';
+        wait for 10 ns;
+    end process;
+    
+    -- Reset Generation
+    process
+    begin
+        reset <= '1';
+        wait for 20 ns;
+        reset <= '0';
+        wait;
+    end process;
+    
+    -- Paddle Control
+    process
+    begin
+        wait for 40 ns;
+        paddle_up <= '1';
+        wait for 10 ns;
+        paddle_up <= '0';
+        wait for 10 ns;
+        paddle_down <= '1';
+        wait for 10 ns;
+        paddle_down <= '0';
+        wait for 10 ns;
+        paddle_up <= '1';
+        wait for 10 ns;
+        paddle_up <= '0';
+        wait;
+    end process;
+    
+    -- Score Check
+    process
+    begin
+        wait for 100 ns;
+        assert score = "00000100" report "Score check failed" severity error;
+        wait;
+    end process;
+    
+end Behavioral;
